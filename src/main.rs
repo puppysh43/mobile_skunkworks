@@ -24,17 +24,73 @@ fn init_quest_db() -> QuestDatabase {
         ),
         ("ExplodedBoulder".to_string(), Quest::new(Vec::new())),
     ]);
-    /*
-    let wild_card_side_quest = Quest::new(vec![
-        ("ContactGreatKhans".to_string(), Quest::new(vec![("AssassinatedPapaKhan")])),
-        ("ContactBrotherhoodOfSteel", ),
-        ("ContactBoomers"),
-        ("ContactWhiteGloveSociety"),
-        ("Completed", Vec::new())
-
-    ])*/
     quest_database.insert("Boulder".to_string(), boulder_quest);
-
+    let complex_quest = Quest::new(vec![
+        //the player can simply get the item by being able to steal it from somewhere
+        ("GetKey".to_string(), Quest::new(Vec::new())),
+        //they may have the necessary tech skill to hack the door themselves
+        ("HackedDoorAlone".to_string(), Quest::new(Vec::new())),
+        //the player can also recruit someone to hack the door for them!
+        (
+            String::from("UsedOutsideHacker"),
+            Quest::new(vec![
+                //they can bribe the hacker which is the simplest but requires 50 credits
+                ("BribedTheHacker".to_string(), Quest::new(Vec::new())),
+                //they can try and convince the hacker its in their best interest to help
+                (
+                    "PersuadedTheHacker".to_string(),
+                    Quest::new(vec![
+                        //if they fail they'll need to pay the hacker even more b/c they've revealed themselves to be desparate
+                        (
+                            "Failure".to_string(),
+                            Quest::new(vec![(
+                                String::from("PaidMoreExpensiveBribe"),
+                                Quest::new(Vec::new()),
+                            )]),
+                        ),
+                        //if they partially succeed they can get the hacker to work for them in exchange for a favor
+                        (
+                            "PartialSuccess".to_string(),
+                            Quest::new(vec![(
+                                "CompletedFavor".to_string(),
+                                Quest::new(Vec::new()),
+                            )]),
+                        ),
+                        //if they fully succeed they can get the hacker to work for them without any comepensation
+                        ("FullSuccess".to_string(), Quest::new(Vec::new())),
+                    ]),
+                ),
+                //they can also try to intimidate the hacker into working for them for free
+                (
+                    "ThreatenedTheHacker".to_string(),
+                    Quest::new(vec![
+                        //if they failed to intimidate the hacker they need to kill one of the hacker's friends
+                        //to threaten him fully
+                        (
+                            "Failure".to_string(),
+                            Quest::new(vec![(
+                                String::from("DecidedToKillHackerFriends"),
+                                Quest::new(Vec::new()),
+                            )]),
+                        ),
+                        //if they partially succeed then they can either take a reduced rate or they can press onward and mutilate
+                        //the hacker lessening their reputation w/ a faction
+                        (
+                            "PartialSuccess".to_string(),
+                            Quest::new(vec![
+                                (String::from("AcceptLowerRate"), Quest::new(Vec::new())),
+                                (String::from("MutilateHacker"), Quest::new(Vec::new())),
+                            ]),
+                        ),
+                        //if the player is able to fully successfully intimidate the hacker then he'll agree to help
+                        //without any payment
+                        ("FullSuccess".to_string(), Quest::new(Vec::new())),
+                    ]),
+                ),
+            ]),
+        ),
+    ]);
+    quest_database.insert(String::from("HackDoor"), complex_quest);
     QuestDatabase::new(quest_database)
 }
 
